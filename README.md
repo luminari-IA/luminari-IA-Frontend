@@ -1,16 +1,47 @@
-# React + Vite
+# Lumirai IA - Frontend (Web)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Bienvenido al repositorio del Frontend web de **Lumirai IA**. Esta aplicación es la interfaz principal para acceder al salón de clases interactivo y a la tutora virtual (Nexa).
 
-Currently, two official plugins are available:
+## Tecnologías Utilizadas
+- **React 19**
+- **Vite**
+- **React Router DOM**
+- **Bootstrap 5** (Base de grillas y utilidades)
+- **CSS Personalizado** (Estilos Glassmorphism, paletas dinámicas)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Estructura del Proyecto
 
-## React Compiler
+```text
+frontend/
+├── public/              # Archivos estáticos
+├── src/
+│   ├── assets/          # Imágenes y recursos gráficos
+│   ├── components/      # Componentes UI reutilizables (Sidebar, Modales, Tarjetas)
+│   ├── layouts/         # Plantillas base (DashboardLayout, AuthLayout)
+│   ├── pages/           # Vistas principales (Salón, Landing, Login, Onboarding)
+│   ├── index.css        # Estilos globales y diseño responsive
+│   ├── main.jsx         # Punto de entrada de React
+│   └── App.jsx          # Enrutamiento principal
+└── vite.config.js       # Configuración del empaquetador
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Instalación y Uso
 
-## Expanding the Oxlint configuration
+1. Instala las dependencias:
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+2. Levanta el servidor de desarrollo local (puerto 5420):
+   ```bash
+   npm run dev
+   ```
+
+3. Construir para producción:
+   ```bash
+   npm run build
+   ```
+
+## Notas de Desarrollo
+- La plataforma ha sido optimizada para ser completamente **responsive**.
+- Toda la lógica visual repetitiva se ha extraído a la carpeta `components/` y `layouts/`.
