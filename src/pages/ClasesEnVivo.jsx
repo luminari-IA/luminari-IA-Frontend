@@ -19,6 +19,10 @@ export default function ClasesEnVivo() {
   const [sessionId, setSessionId] = useState(null)
   const [chatHistory, setChatHistory] = useState([])
   const [loading, setLoading] = useState(false)
+  
+  // Nuevo estado para la clase dinámica
+  const [liveClass, setLiveClass] = useState(null)
+  const [loadingClass, setLoadingClass] = useState(true)
 
   // Reemplazar marcador de posición con el nombre real
   const transcript = TRANSCRIPT_BASE.map(t => ({
@@ -26,20 +30,31 @@ export default function ClasesEnVivo() {
     who: t.who === 'ESTUDIANTE_NAME' ? userName : t.who
   }))
 
-  // Iniciar sesión con Nexa al entrar a la clase
   useEffect(() => {
-    async function initNexaSession() {
+    async function fetchAndInit() {
       try {
-        const res = await api.post('/tutor/session', {
-          subject_id: 1, // Simulamos ID de materia Física
-          title: 'Dudas en Clase en Vivo: Movimiento Armónico'
-        });
-        setSessionId(res.data.data.id);
+        // 1. Obtener la clase en vivo desde el backend
+        const classRes = await api.get('/live-classes');
+        const classes = classRes.data.data;
+        
+        if (classes && classes.length > 0) {
+          const activeClass = classes[0]; // Tomamos la primera disponible
+          setLiveClass(activeClass);
+          
+          // 2. Iniciar sesión con Nexa usando los datos reales
+          const nexaRes = await api.post('/tutor/session', {
+            subject_id: activeClass.subject_id,
+            title: `Dudas en Clase en Vivo: ${activeClass.title}`
+          });
+          setSessionId(nexaRes.data.data.id);
+        }
       } catch (err) {
-        console.error("Error al iniciar sesión con Nexa:", err);
+        console.error("Error al cargar la clase o iniciar sesión con Nexa:", err);
+      } finally {
+        setLoadingClass(false);
       }
     }
-    initNexaSession();
+    fetchAndInit();
   }, []);
 
   const enviarDuda = async () => {
@@ -62,15 +77,31 @@ export default function ClasesEnVivo() {
     }
   };
 
+  if (loadingClass) {
+    return (
+      <DashboardLayout breadcrumb="LUMIRAI / CLASES EN VIVO" title="Cargando clase..." subtitle="">
+        <div className="text-center p-5"><div className="spinner-border text-primary" /></div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!liveClass) {
+    return (
+      <DashboardLayout breadcrumb="LUMIRAI / CLASES EN VIVO" title="No hay clases en vivo" subtitle="Actualmente no hay clases programadas.">
+        <div className="lum-card p-5 text-center">No se encontraron clases activas en este momento.</div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout
-      breadcrumb="LUMIRAI / CLASES EN VIVO"
-      title="Física: Movimiento armónico"
-      subtitle="Profesor Alex Rivera · 8 estudiantes conectados"
+      breadcrumb={`LUMIRAI / EN VIVO / ${liveClass.subject?.name?.toUpperCase() || 'GENERAL'}`}
+      title={`${liveClass.subject?.name || 'Materia'}: ${liveClass.title}`}
+      subtitle={`Clase de Luminary · Fecha: ${new Date(liveClass.scheduled_at).toLocaleString()}`}
       rightElement={
         <div className="badge-pill badge-primary">
           <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff', display: 'inline-block', marginRight: 6 }} />
-          EN VIVO
+          {liveClass.status === 'live' ? 'EN VIVO' : 'PROGRAMADA'}
         </div>
       }
     >

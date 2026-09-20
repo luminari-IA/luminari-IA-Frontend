@@ -32,32 +32,36 @@ export default function Sidebar({ isOpen, onClose }) {
       </div>
 
       <ul className="sidebar-nav">
-        <li>
-          <NavLink to="/salon" end className={({ isActive }) => isActive ? 'active' : ''}>
-            <i className="bi bi-house-door-fill" />
-            Salón de clases
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/salon/vivo" className={({ isActive }) => isActive ? 'active' : ''}>
-            <i className="bi bi-camera-video-fill" />
-            Clases en vivo
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/salon/nivel" className={({ isActive }) => isActive ? 'active' : ''}>
-            <i className="bi bi-mortarboard-fill" />
-            Nivel educativo
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/salon/evaluaciones" onClick={onClose} className={({ isActive }) => `lum-nav-link ${isActive ? 'active' : ''}`}>
-            <i className="bi bi-file-earmark-check" /> Evaluaciones
-          </NavLink>
-        </li>
+        {user?.role !== 'admin' && (
+          <>
+            <li>
+              <NavLink to="/salon" end className={({ isActive }) => isActive ? 'active' : ''}>
+                <i className="bi bi-house-door-fill" />
+                Salón de clases
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/salon/vivo" className={({ isActive }) => isActive ? 'active' : ''}>
+                <i className="bi bi-camera-video-fill" />
+                Clases en vivo
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/salon/nivel" className={({ isActive }) => isActive ? 'active' : ''}>
+                <i className="bi bi-mortarboard-fill" />
+                Nivel educativo
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/salon/evaluaciones" onClick={onClose} className={({ isActive }) => `lum-nav-link ${isActive ? 'active' : ''}`}>
+                <i className="bi bi-file-earmark-check" /> Evaluaciones
+              </NavLink>
+            </li>
+          </>
+        )}
 
         {user?.role === 'admin' && (
-          <li style={{ marginTop: '2rem' }}>
+          <li style={{ marginTop: user?.role === 'admin' ? '0' : '2rem' }}>
             <NavLink to="/admin" onClick={onClose} className={({ isActive }) => `lum-nav-link ${isActive ? 'active' : ''}`} style={{ color: 'var(--lum-primary2)' }}>
               <i className="bi bi-shield-lock" /> Panel de Admin
             </NavLink>
