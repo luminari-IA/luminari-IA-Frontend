@@ -1,8 +1,16 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
 
 export default function ProtectedRoute({ children }) {
     const { token, user, isLoading } = useAuth();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.search.includes('viewAsStudent=true')) {
+            sessionStorage.setItem('viewAsStudent', 'true');
+        }
+    }, [location]);
 
     if (isLoading) {
         return (
@@ -18,7 +26,9 @@ export default function ProtectedRoute({ children }) {
         return <Navigate to="/login" replace />;
     }
 
-    if (user && user.role === 'admin') {
+    const isViewingAsStudent = sessionStorage.getItem('viewAsStudent') === 'true';
+
+    if (user && user.role === 'admin' && !isViewingAsStudent) {
         return <Navigate to="/admin" replace />;
     }
 

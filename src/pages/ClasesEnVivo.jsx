@@ -60,7 +60,7 @@ export default function ClasesEnVivo() {
       const res = await api.post(`/tutor/session/${sessionId}/message`, {
         message: mensajeUsuario
       });
-      setChatHistory(prev => [...prev, { role: 'assistant', content: res.data.data.response }]);
+      setChatHistory(prev => [...prev, { role: 'assistant', content: res.data.reply }]);
     } catch (err) {
       setChatHistory(prev => [...prev, { role: 'system', content: 'Error de conexión con Nexa.' }]);
     } finally {

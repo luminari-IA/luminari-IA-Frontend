@@ -86,6 +86,24 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
         </div>
 
+        {/* Botón ver como estudiante (solo admin) */}
+        {user?.role === 'admin' && (
+          <button
+            onClick={() => window.open('/salon?viewAsStudent=true', '_blank')}
+            style={{
+              marginTop: 16, width: '100%', display: 'flex', alignItems: 'center',
+              gap: 8, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--lum-border)',
+              background: 'rgba(255,255,255,.05)', color: 'var(--lum-text)', cursor: 'pointer',
+              fontSize: '.82rem', fontWeight: 600, transition: 'all .18s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--lum-primary)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,.05)'}
+          >
+            <i className="bi bi-person-video3" />
+            Ver como estudiante
+          </button>
+        )}
+
         {/* Botón cerrar sesión */}
         <button
           onClick={cerrarSesion}
