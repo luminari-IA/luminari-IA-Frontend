@@ -28,7 +28,7 @@ export default function Salon() {
       const data = res.data.data.map((m, i) => ({
         ...m,
         color: colors[i % colors.length],
-        pct: Math.floor(Math.random() * 40) + 40 // simular progreso
+        pct: 0 // Iniciar en 0% ya que no hay historial real
       }))
       setMaterias(data)
     }).catch(err => console.error(err))
@@ -95,13 +95,13 @@ export default function Salon() {
           {/* Stats row */}
           <div className="row g-3 mb-4 fade-up fade-up-d1">
             <div className="col-sm-4">
-              <StatCard value="68%" label="Dominio general" colorClass="primary2" progress={68} />
+              <StatCard value="0%" label="Dominio general" colorClass="primary2" progress={0} />
             </div>
             <div className="col-sm-4">
-              <StatCard value="12" label="Racha actual" colorClass="accent" subtitle="días" />
+              <StatCard value="0" label="Racha actual" colorClass="accent" subtitle="días" />
             </div>
             <div className="col-sm-4">
-              <StatCard value="7.4h" label="Enfoque semanal" colorClass="warning" subtitle="esta semana" />
+              <StatCard value="0h" label="Enfoque semanal" colorClass="warning" subtitle="esta semana" />
             </div>
           </div>
 

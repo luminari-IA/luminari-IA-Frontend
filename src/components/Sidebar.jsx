@@ -13,7 +13,7 @@ export default function Sidebar({ isOpen, onClose }) {
   // Obtener inicial del usuario (o 'L' si no hay nombre)
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'L'
   const userName = user?.name || 'Estudiante'
-  const planName = user?.plan?.name || user?.plan || 'BÁSICO'
+
 
   return (
     <aside className={`lum-sidebar ${isOpen ? 'sidebar-open' : ''}`}>
@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <div>
             <div className="name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px' }}>{userName}</div>
             <div className="level">
-              <span className="badge-pill badge-primary me-1">PLAN {planName.toUpperCase()}</span>
+              <span className="badge-pill badge-primary me-1">{user?.role === 'admin' ? 'CREADOR' : 'ESTUDIANTE'}</span>
             </div>
           </div>
         </div>
