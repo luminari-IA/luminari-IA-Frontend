@@ -12,12 +12,13 @@ import NivelEducativo from './pages/NivelEducativo'
 import Evaluaciones from './pages/Evaluaciones'
 import PruebaGratuita from './pages/PruebaGratuita'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
+import AdminDashboard from './pages/admin/AdminDashboard'
+
 export default function App() {
   return (
     <>
-      {/* Modal de términos — se muestra en TODA la app al primer acceso */}
       <TermsModal />
-
       <Routes>
         <Route path="/"                      element={<Landing />} />
         <Route path="/login"                 element={<Login />} />
@@ -32,6 +33,9 @@ export default function App() {
         <Route path="/salon/vivo"            element={<ProtectedRoute><ClasesEnVivo /></ProtectedRoute>} />
         <Route path="/salon/nivel"           element={<ProtectedRoute><NivelEducativo /></ProtectedRoute>} />
         <Route path="/salon/evaluaciones"    element={<ProtectedRoute><Evaluaciones /></ProtectedRoute>} />
+        
+        {/* Rutas Administrador */}
+        <Route path="/admin"                 element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         
         <Route path="*"                      element={<Navigate to="/" />} />
       </Routes>
