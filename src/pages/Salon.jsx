@@ -14,7 +14,7 @@ export default function Salon() {
 
   const [materias, setMaterias] = useState([])
   const [tareas, setTareas] = useState([])
-  const [claseEnVivo, setClaseEnVivo] = useState(null)
+
   
   const [tareaSeleccionada, setTareaSeleccionada] = useState(null)
   const [dragging, setDragging] = useState(false)
@@ -50,12 +50,7 @@ export default function Salon() {
       setTareas(tasksData)
     }).catch(err => console.error(err))
 
-    // Cargar próxima clase en vivo
-    api.get('/live-classes').then(res => {
-      if (res.data.data.length > 0) {
-        setClaseEnVivo(res.data.data[0])
-      }
-    }).catch(err => console.error(err))
+
   }, [])
 
   function abrirTarea(t) { setTareaSeleccionada(t) }
@@ -87,7 +82,7 @@ export default function Salon() {
     <DashboardLayout
       breadcrumb="Lumirai / Salón de clases"
       title={`Buenos días, ${userName} 👋`}
-      subtitle={`Tienes ${pendientes} tarea${pendientes !== 1 ? 's' : ''} pendiente${pendientes !== 1 ? 's' : ''}${claseEnVivo ? ' y una clase programada.' : '.'}`}
+      subtitle={`Tienes ${pendientes} tarea${pendientes !== 1 ? 's' : ''} pendiente${pendientes !== 1 ? 's' : ''}.`}
       rightElement={
         <div className="badge-pill badge-success">
           <i className="bi bi-cpu-fill" /> IA CONECTADA
@@ -158,27 +153,19 @@ export default function Salon() {
 
         {/* Right column */}
         <div className="col-lg-4">
-          {claseEnVivo ? (
-            <div className="lum-card p-4 mb-4 fade-up fade-up-d1" style={{ border: '1px solid rgba(108,99,255,.3)' }}>
-              <div className="badge-pill badge-primary mb-3">
-                {new Date(claseEnVivo.scheduled_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-              </div>
-              <h5 style={{ fontWeight: 700, color: '#fff', marginBottom: 4 }}>{claseEnVivo.title}</h5>
-              <p style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginBottom: 16 }}>
-                Con Nexa · {claseEnVivo.subject?.name || 'Materia General'}
-              </p>
-              <Link to="/salon/vivo" className="btn-lum btn-lum-primary w-100 justify-content-center" style={{ padding: '10px' }}>
-                Ir a la clase
-              </Link>
+          <div className="lum-card p-4 mb-4 fade-up fade-up-d1" style={{ border: '1px solid rgba(108,99,255,.3)' }}>
+            <div className="badge-pill badge-primary mb-3">
+              <i className="bi bi-robot" /> NUEVO
             </div>
-          ) : (
-            <div className="lum-card p-4 mb-4 fade-up fade-up-d1">
-              <h5 style={{ fontWeight: 700, color: '#fff', marginBottom: 4 }}>Próxima Clase</h5>
-              <p style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginBottom: 0 }}>
-                No tienes clases programadas hoy.
-              </p>
-            </div>
-          )}
+            <h5 style={{ fontWeight: 700, color: '#fff', marginBottom: 4 }}>Clases bajo demanda</h5>
+            <p style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginBottom: 16 }}>
+              Inicia una sesión interactiva con Nexa en cualquier momento.
+            </p>
+            <Link to="/salon/vivo" className="btn-lum btn-lum-primary w-100 justify-content-center" style={{ padding: '10px' }}>
+              <i className="bi bi-play-fill me-2" />
+              Empezar ahora
+            </Link>
+          </div>
 
           <div className="lum-card p-4 fade-up fade-up-d2">
             <h6 style={{ fontWeight: 700, color: '#fff', marginBottom: 12 }}>Resumen de tareas</h6>

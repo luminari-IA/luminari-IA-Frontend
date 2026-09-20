@@ -8,50 +8,46 @@ export default function AdminDashboard() {
   // States
   const [promptContent, setPromptContent] = useState('');
   const [materias, setMaterias] = useState([]);
-  const [clases, setClases] = useState([]);
+  
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchPrompt();
     fetchMaterias();
-    fetchClases();
   }, []);
 
   const fetchPrompt = () => api.get('/admin/prompt').then(r => setPromptContent(r.data.data.content));
   const fetchMaterias = () => api.get('/admin/subjects').then(r => setMaterias(r.data.data));
-  const fetchClases = () => api.get('/admin/live-classes').then(r => setClases(r.data.data));
 
   const handlePromptSave = async () => {
     await api.put('/admin/prompt', { content: promptContent });
     alert("Prompt actualizado");
   };
 
-  const handleAddMateria = async () => {
-    const name = prompt("Nombre de la materia:");
-    if (!name) return;
-    await api.post('/admin/subjects', { name, is_active: true });
-    fetchMaterias();
+  const handleAddMateria = async (e) => {
+    e.preventDefault();
+    if (!newSubjectName.trim()) return;
+    
+    setIsSubmitting(true);
+    try {
+      await api.post('/admin/subjects', { name: newSubjectName, is_active: true });
+      await fetchMaterias();
+      setIsModalOpen(false);
+      setNewSubjectName('');
+    } catch (error) {
+      console.error("Error creating subject:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDeleteMateria = async (id) => {
     if (!confirm("¿Borrar materia?")) return;
     await api.delete(`/admin/subjects/${id}`);
     fetchMaterias();
-  };
-
-  const handleAddClase = async () => {
-    if (materias.length === 0) return alert("Crea una materia primero");
-    const title = prompt("Título de la clase:");
-    if (!title) return;
-    await api.post('/admin/live-classes', {
-      title, subject_id: materias[0].id, scheduled_at: new Date().toISOString().slice(0,19).replace('T', ' '), status: 'pending'
-    });
-    fetchClases();
-  };
-
-  const handleDeleteClase = async (id) => {
-    if (!confirm("¿Borrar clase?")) return;
-    await api.delete(`/admin/live-classes/${id}`);
-    fetchClases();
   };
 
   return (
@@ -63,10 +59,9 @@ export default function AdminDashboard() {
       <div className="d-flex gap-3 mb-4">
         <button className={`btn-lum ${activeTab === 'prompt' ? 'btn-lum-primary' : 'btn-lum-ghost'}`} onClick={() => setActiveTab('prompt')}>Prompt Nexa</button>
         <button className={`btn-lum ${activeTab === 'materias' ? 'btn-lum-primary' : 'btn-lum-ghost'}`} onClick={() => setActiveTab('materias')}>Materias</button>
-        <button className={`btn-lum ${activeTab === 'clases' ? 'btn-lum-primary' : 'btn-lum-ghost'}`} onClick={() => setActiveTab('clases')}>Clases en Vivo</button>
       </div>
 
-      <div className="lum-card p-4">
+      <div className="lum-card p-4 fade-up fade-up-d1">
         {activeTab === 'prompt' && (
           <div>
             <h5 style={{color: '#fff', fontWeight: 800}}>Configuración del Cerebro de Nexa</h5>
@@ -87,39 +82,70 @@ export default function AdminDashboard() {
           <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h5 style={{color: '#fff', fontWeight: 800}}>Materias Ofrecidas</h5>
-              <button className="btn-lum btn-lum-primary" onClick={handleAddMateria}>+ Añadir Materia</button>
+              <button className="btn-lum btn-lum-primary" onClick={() => setIsModalOpen(true)}>+ Añadir Materia</button>
             </div>
-            <ul className="list-group">
-              {materias.map(m => (
-                <li key={m.id} className="list-group-item d-flex justify-content-between" style={{background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--lum-border)'}}>
-                  <span>{m.name}</span>
-                  <button className="btn-lum btn-lum-ghost text-danger p-0" onClick={() => handleDeleteMateria(m.id)}>Eliminar</button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {activeTab === 'clases' && (
-          <div>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h5 style={{color: '#fff', fontWeight: 800}}>Clases en Vivo Programadas</h5>
-              <button className="btn-lum btn-lum-primary" onClick={handleAddClase}>+ Añadir Clase</button>
-            </div>
-            <ul className="list-group">
-              {clases.map(c => (
-                <li key={c.id} className="list-group-item d-flex justify-content-between" style={{background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--lum-border)'}}>
-                  <div>
-                    <strong>{c.title}</strong>
-                    <div style={{fontSize: '0.75rem', color: 'var(--lum-muted)'}}>Materia: {c.subject?.name} | Fecha: {new Date(c.scheduled_at).toLocaleString()}</div>
-                  </div>
-                  <button className="btn-lum btn-lum-ghost text-danger p-0" onClick={() => handleDeleteClase(c.id)}>Eliminar</button>
-                </li>
-              ))}
-            </ul>
+            
+            {materias.length === 0 ? (
+              <div className="text-center p-5" style={{ background: 'rgba(255,255,255,.02)', borderRadius: 12, border: '1px solid var(--lum-border)' }}>
+                <p style={{ color: 'var(--lum-muted)', margin: 0 }}>No hay materias creadas todavía.</p>
+              </div>
+            ) : (
+              <ul className="list-group">
+                {materias.map((m, i) => (
+                  <li key={m.id} className="list-group-item d-flex justify-content-between align-items-center fade-up" style={{ animationDelay: `${i * 0.05}s`, background: 'rgba(255,255,255,0.02)', color: '#fff', border: '1px solid var(--lum-border)', marginBottom: 8, borderRadius: 8 }}>
+                    <div className="d-flex align-items-center gap-3">
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(108,99,255,.15)', color: 'var(--lum-primary2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className="bi bi-book-half" />
+                      </div>
+                      <span style={{ fontWeight: 600 }}>{m.name}</span>
+                    </div>
+                    <button className="btn-lum btn-lum-ghost text-danger p-2" onClick={() => handleDeleteMateria(m.id)}>
+                      <i className="bi bi-trash" /> Eliminar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </div>
+
+      {/* Modal Añadir Materia */}
+      {isModalOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,.7)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+        }}>
+          <div className="lum-card" style={{ width: '100%', maxWidth: 450, padding: 0, overflow: 'hidden', animation: 'fadeUp .3s ease-out' }}>
+            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--lum-border)' }}>
+              <h5 style={{ margin: 0, fontWeight: 800, color: '#fff' }}>Crear nueva materia</h5>
+            </div>
+            <div style={{ padding: 24 }}>
+              <form onSubmit={handleAddMateria}>
+                <div className="mb-4">
+                  <label style={{ display: 'block', fontSize: '.85rem', fontWeight: 600, color: 'var(--lum-muted)', marginBottom: 8 }}>Nombre de la materia</label>
+                  <input 
+                    type="text" 
+                    className="lum-input" 
+                    placeholder="Ej. Física Avanzada" 
+                    value={newSubjectName}
+                    onChange={e => setNewSubjectName(e.target.value)}
+                    autoFocus
+                    required
+                  />
+                </div>
+                <div className="d-flex justify-content-end gap-2">
+                  <button type="button" className="btn-lum btn-lum-ghost" onClick={() => setIsModalOpen(false)}>Cancelar</button>
+                  <button type="submit" className="btn-lum btn-lum-primary" disabled={isSubmitting || !newSubjectName.trim()}>
+                    {isSubmitting ? 'Creando...' : 'Añadir materia'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   )
 }
