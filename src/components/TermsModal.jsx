@@ -37,10 +37,10 @@ export default function TermsModal() {
       <div style={{
         position: 'fixed', inset: 0, background: 'rgba(0,0,0,.75)',
         backdropFilter: 'blur(6px)', zIndex: 9999,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
       }}>
         <div className="lum-card fade-up" style={{
-          maxWidth: 520, width: '100%', padding: 36,
+          maxWidth: 520, width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: 24,
           border: '1px solid rgba(108,99,255,.3)',
           boxShadow: '0 24px 80px rgba(0,0,0,.6), 0 0 40px rgba(108,99,255,.15)'
         }}>

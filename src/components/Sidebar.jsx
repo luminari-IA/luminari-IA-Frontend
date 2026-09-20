@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate()
 
   function cerrarSesion() {
@@ -9,10 +9,19 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="lum-sidebar">
-      <div className="sidebar-logo">
-        <div className="logo-icon">L</div>
-        <span>Lumirai IA</span>
+    <aside className={`lum-sidebar ${isOpen ? 'sidebar-open' : ''}`}>
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <div className="sidebar-logo mb-0">
+          <div className="logo-icon">L</div>
+          <span>Lumirai IA</span>
+        </div>
+        <button 
+          className="d-lg-none btn-lum btn-lum-ghost" 
+          style={{ padding: '4px 8px', border: 'none' }}
+          onClick={onClose}
+        >
+          <i className="bi bi-x-lg" style={{ fontSize: '1.2rem' }} />
+        </button>
       </div>
 
       <ul className="sidebar-nav">

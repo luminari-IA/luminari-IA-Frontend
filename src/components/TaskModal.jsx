@@ -5,12 +5,12 @@ export default function TaskModal({ task, onClose, onDrop, onFileChange, fileRef
     <div style={{
       position: 'fixed', inset: 0, background: 'rgba(0,0,0,.7)',
       backdropFilter: 'blur(6px)', zIndex: 9000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16
     }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="lum-card fade-up" style={{
-        maxWidth: 560, width: '100%', padding: 32,
+        maxWidth: 560, width: '100%', maxHeight: '90vh', overflowY: 'auto', padding: 24,
         border: `1px solid ${task.color}40`,
         boxShadow: `0 24px 80px rgba(0,0,0,.6), 0 0 40px ${task.color}20`
       }}>

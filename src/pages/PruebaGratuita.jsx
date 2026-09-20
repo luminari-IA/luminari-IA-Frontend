@@ -55,7 +55,10 @@ export default function PruebaGratuita() {
       </nav>
 
       {/* Tab bar */}
-      <div className="d-flex gap-2 px-4 py-3" style={{ borderBottom: '1px solid var(--lum-border)', position: 'sticky', top: 57, zIndex: 99, background: 'var(--lum-bg)' }}>
+      <div className="d-flex gap-2 px-4 py-3" style={{ 
+        borderBottom: '1px solid var(--lum-border)', position: 'sticky', top: 57, zIndex: 99, 
+        background: 'var(--lum-bg)', overflowX: 'auto', whiteSpace: 'nowrap' 
+      }}>
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             padding: '8px 20px', borderRadius: 8, fontWeight: 600, fontSize: '.85rem',
