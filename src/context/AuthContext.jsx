@@ -12,8 +12,8 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (token) {
-            // Validar token y cargar plan
-            api.get('/my-plan')
+            // Validar token y cargar usuario
+            api.get('/user')
                 .then((res) => {
                     setUser(res.data);
                 })

@@ -13,7 +13,7 @@ export default function Sidebar({ isOpen, onClose }) {
   // Obtener inicial del usuario (o 'L' si no hay nombre)
   const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'L'
   const userName = user?.name || 'Estudiante'
-  const planName = user?.plan || 'BÁSICO'
+  const planName = user?.plan?.name || user?.plan || 'BÁSICO'
 
   return (
     <aside className={`lum-sidebar ${isOpen ? 'sidebar-open' : ''}`}>
