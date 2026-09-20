@@ -1,12 +1,19 @@
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate()
+  const { user, logout } = useAuth()
 
   function cerrarSesion() {
-    // Aquí irá la lógica de logout cuando haya auth real
+    logout()
     navigate('/login')
   }
+
+  // Obtener inicial del usuario (o 'L' si no hay nombre)
+  const initial = user?.name ? user.name.charAt(0).toUpperCase() : 'L'
+  const userName = user?.name || 'Estudiante'
+  const planName = user?.plan || 'BÁSICO'
 
   return (
     <aside className={`lum-sidebar ${isOpen ? 'sidebar-open' : ''}`}>
@@ -59,20 +66,12 @@ export default function Sidebar({ isOpen, onClose }) {
             background: 'linear-gradient(135deg,#6c63ff,#a855f7)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 700, fontSize: '.85rem', color: '#fff', flexShrink: 0
-          }}>S</div>
+          }}>{initial}</div>
           <div>
-            <div className="name">Sofía Martínez</div>
+            <div className="name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px' }}>{userName}</div>
             <div className="level">
-              <span className="badge-pill badge-primary me-1">RACHA · 12 DÍAS</span>
+              <span className="badge-pill badge-primary me-1">PLAN {planName.toUpperCase()}</span>
             </div>
-          </div>
-        </div>
-        <div className="mt-2">
-          <div className="d-flex justify-content-between mb-1" style={{ fontSize: '.72rem', color: 'var(--lum-muted)' }}>
-            <span>INTERMEDIO</span><span>68%</span>
-          </div>
-          <div className="lum-progress">
-            <div className="lum-progress-fill" style={{ width: '68%' }} />
           </div>
         </div>
 

@@ -1,16 +1,66 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DashboardLayout from '../layouts/DashboardLayout'
+import api from '../api/axios'
+import { useAuth } from '../context/AuthContext'
 
 // Simulador de transcripción en tiempo real
-const TRANSCRIPT = [
+const TRANSCRIPT_BASE = [
   { time: '16:30', who: 'Profe. Alex', text: 'Bienvenidos todos. Hoy hablaremos del movimiento armónico simple.' },
   { time: '16:32', who: 'Profe. Alex', text: 'Imaginen un péndulo. La fuerza que lo hace volver a su posición central es proporcional a...' },
-  { time: '16:33', who: 'Sofía',       text: '¿A la distancia desde el centro?' },
-  { time: '16:33', who: 'Profe. Alex', text: '¡Exacto, Sofía! A eso se le llama fuerza restauradora.' },
+  { time: '16:33', who: 'ESTUDIANTE_NAME', text: '¿A la distancia desde el centro?' },
+  { time: '16:33', who: 'Profe. Alex', text: '¡Exacto! A eso se le llama fuerza restauradora.' },
 ]
 
 export default function ClasesEnVivo() {
+  const { user } = useAuth()
+  const userName = user?.name ? user.name.split(' ')[0] : 'Estudiante'
+  
   const [duda, setDuda] = useState('')
+  const [sessionId, setSessionId] = useState(null)
+  const [chatHistory, setChatHistory] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  // Reemplazar marcador de posición con el nombre real
+  const transcript = TRANSCRIPT_BASE.map(t => ({
+    ...t,
+    who: t.who === 'ESTUDIANTE_NAME' ? userName : t.who
+  }))
+
+  // Iniciar sesión con Nexa al entrar a la clase
+  useEffect(() => {
+    async function initNexaSession() {
+      try {
+        const res = await api.post('/tutor/session', {
+          subject_id: 1, // Simulamos ID de materia Física
+          title: 'Dudas en Clase en Vivo: Movimiento Armónico'
+        });
+        setSessionId(res.data.data.id);
+      } catch (err) {
+        console.error("Error al iniciar sesión con Nexa:", err);
+      }
+    }
+    initNexaSession();
+  }, []);
+
+  const enviarDuda = async () => {
+    if (!duda.trim() || !sessionId || loading) return;
+
+    const mensajeUsuario = duda;
+    setDuda('');
+    setChatHistory(prev => [...prev, { role: 'user', content: mensajeUsuario }]);
+    setLoading(true);
+
+    try {
+      const res = await api.post(`/tutor/session/${sessionId}/message`, {
+        message: mensajeUsuario
+      });
+      setChatHistory(prev => [...prev, { role: 'assistant', content: res.data.data.response }]);
+    } catch (err) {
+      setChatHistory(prev => [...prev, { role: 'system', content: 'Error al conectar con Nexa.' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DashboardLayout
@@ -72,13 +122,51 @@ export default function ClasesEnVivo() {
                 </p>
               </div>
             </div>
+
+            {/* Chat History */}
+            {chatHistory.length > 0 && (
+              <div className="mb-3 p-3" style={{ background: 'rgba(0,0,0,.2)', borderRadius: 8, maxHeight: 200, overflowY: 'auto' }}>
+                {chatHistory.map((msg, i) => (
+                  <div key={i} className={`mb-2 text-${msg.role === 'user' ? 'end' : 'start'}`}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '8px 12px',
+                      borderRadius: 12,
+                      background: msg.role === 'user' ? 'var(--lum-primary)' : 'rgba(255,255,255,.1)',
+                      color: '#fff',
+                      fontSize: '.85rem',
+                      maxWidth: '85%',
+                      textAlign: 'left'
+                    }}>
+                      {msg.content}
+                    </span>
+                  </div>
+                ))}
+                {loading && (
+                  <div className="text-start">
+                    <span style={{ display: 'inline-block', padding: '8px 12px', borderRadius: 12, background: 'rgba(255,255,255,.1)', color: 'var(--lum-muted)', fontSize: '.85rem' }}>
+                      <i className="bi bi-three-dots pulse-dot"></i> Escribiendo...
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="d-flex gap-2">
               <input 
                 type="text" className="lum-input flex-grow-1"
                 placeholder="Ej. ¿Por qué dijo que la gravedad no afecta el periodo de un resorte?"
-                value={duda} onChange={e => setDuda(e.target.value)}
+                value={duda} 
+                onChange={e => setDuda(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && enviarDuda()}
+                disabled={loading || !sessionId}
               />
-              <button className="btn-lum btn-lum-primary" style={{ padding: '10px 16px' }}>
+              <button 
+                className="btn-lum btn-lum-primary" 
+                style={{ padding: '10px 16px' }}
+                onClick={enviarDuda}
+                disabled={loading || !sessionId}
+              >
                 <i className="bi bi-send-fill" />
               </button>
             </div>
@@ -95,10 +183,10 @@ export default function ClasesEnVivo() {
             </div>
             
             <div className="p-3 flex-grow-1" style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {TRANSCRIPT.map((line, i) => (
+              {transcript.map((line, i) => (
                 <div key={i}>
                   <div className="d-flex align-items-center gap-2 mb-1">
-                    <span style={{ fontSize: '.75rem', fontWeight: 700, color: line.who === 'Sofía' ? 'var(--lum-primary2)' : 'var(--lum-muted)' }}>
+                    <span style={{ fontSize: '.75rem', fontWeight: 700, color: line.who === userName ? 'var(--lum-primary2)' : 'var(--lum-muted)' }}>
                       {line.who.toUpperCase()}
                     </span>
                     <span style={{ fontSize: '.7rem', color: 'rgba(255,255,255,.3)' }}>{line.time}</span>

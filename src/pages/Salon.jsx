@@ -1,47 +1,62 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import DashboardLayout from '../layouts/DashboardLayout'
 import StatCard from '../components/ui/StatCard'
 import ProgressCourse from '../components/ui/ProgressCourse'
 import TaskItem from '../components/ui/TaskItem'
 import TaskModal from '../components/TaskModal'
-
-const MATERIAS = [
-  { name: 'Física',       tema: 'Movimiento armónico',    pct: 72, color: '#6c63ff' },
-  { name: 'Matemáticas',  tema: 'Funciones cuadráticas',  pct: 64, color: '#00d4ff' },
-  { name: 'Química',      tema: 'Reacciones redox',       pct: 48, color: '#f59e0b' },
-  { name: 'Biología',     tema: 'Genética molecular',     pct: 84, color: '#22c55e' },
-]
-
-const TAREAS_INIT = [
-  {
-    id: 1, materia: 'Física',      color: '#6c63ff',
-    titulo: 'Simulación del péndulo',
-    desc: 'Realiza la simulación del péndulo simple. Anota los valores de periodo para diferentes longitudes (0.5m, 1m, 1.5m) y elabora una tabla comparativa.',
-    due: 'Hoy · 23:59', done: false, archivo: null,
-    iaNote: 'Nexa sugiere usar la fórmula T = 2π√(L/g) para validar tus resultados.'
-  },
-  {
-    id: 2, materia: 'Matemáticas', color: '#00d4ff',
-    titulo: 'Ejercicios 8–14',
-    desc: 'Resuelve los ejercicios de funciones cuadráticas del libro. Muestra el procedimiento completo y grafica al menos 3 parábolas.',
-    due: 'Mañana · 18:00', done: true, archivo: 'ejercicios_mat.pdf',
-    iaNote: 'Nexa revisó tu entrega anterior. ¡Excelente comprensión del vértice!'
-  },
-  {
-    id: 3, materia: 'Química',     color: '#f59e0b',
-    titulo: 'Reporte de laboratorio',
-    desc: 'Elabora el reporte de la práctica de reacciones redox. Incluye: objetivo, materiales, procedimiento, resultados y conclusiones.',
-    due: 'Vie 22 · 12:00', done: false, archivo: null,
-    iaNote: 'Nexa preparó una guía de formato para el reporte. Accede desde Recursos.'
-  },
-]
+import { useAuth } from '../context/AuthContext'
+import api from '../api/axios'
 
 export default function Salon() {
-  const [tareas, setTareas] = useState(TAREAS_INIT)
+  const { user } = useAuth()
+  const userName = user?.name ? user.name.split(' ')[0] : 'Estudiante'
+
+  const [materias, setMaterias] = useState([])
+  const [tareas, setTareas] = useState([])
+  const [claseEnVivo, setClaseEnVivo] = useState(null)
+  
   const [tareaSeleccionada, setTareaSeleccionada] = useState(null)
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef()
+
+  useEffect(() => {
+    // Cargar materias
+    api.get('/subjects').then(res => {
+      // Mapeamos colores y porcentajes aleatorios/falsos por ahora si no vienen del back
+      const colors = ['#6c63ff', '#00d4ff', '#f59e0b', '#22c55e'];
+      const data = res.data.data.map((m, i) => ({
+        ...m,
+        color: colors[i % colors.length],
+        pct: Math.floor(Math.random() * 40) + 40 // simular progreso
+      }))
+      setMaterias(data)
+    }).catch(err => console.error(err))
+
+    // Cargar tareas reales
+    api.get('/tasks').then(res => {
+      const colors = ['#6c63ff', '#00d4ff', '#f59e0b', '#22c55e'];
+      const tasksData = res.data.data.map((t, i) => ({
+        id: t.id,
+        materia: t.subject?.name || 'General',
+        color: colors[i % colors.length],
+        titulo: t.title,
+        desc: t.description,
+        due: t.due_date ? new Date(t.due_date).toLocaleDateString() : 'Sin fecha',
+        done: t.is_completed,
+        archivo: t.file_path,
+        iaNote: t.nexa_note
+      }))
+      setTareas(tasksData)
+    }).catch(err => console.error(err))
+
+    // Cargar próxima clase en vivo
+    api.get('/live-classes').then(res => {
+      if (res.data.data.length > 0) {
+        setClaseEnVivo(res.data.data[0])
+      }
+    }).catch(err => console.error(err))
+  }, [])
 
   function abrirTarea(t) { setTareaSeleccionada(t) }
   function cerrarModal() { setTareaSeleccionada(null) }
@@ -71,8 +86,8 @@ export default function Salon() {
   return (
     <DashboardLayout
       breadcrumb="Lumirai / Salón de clases"
-      title="Buenos días, Sofía 👋"
-      subtitle={`Tienes ${pendientes} tarea${pendientes !== 1 ? 's' : ''} pendiente${pendientes !== 1 ? 's' : ''} y una clase en vivo a las 16:30.`}
+      title={`Buenos días, ${userName} 👋`}
+      subtitle={`Tienes ${pendientes} tarea${pendientes !== 1 ? 's' : ''} pendiente${pendientes !== 1 ? 's' : ''}${claseEnVivo ? ' y una clase programada.' : '.'}`}
       rightElement={
         <div className="badge-pill badge-success">
           <i className="bi bi-cpu-fill" /> IA CONECTADA
@@ -99,18 +114,24 @@ export default function Salon() {
           <div className="lum-card p-4 mb-4 fade-up fade-up-d2">
             <div className="d-flex align-items-center justify-content-between mb-4">
               <h5 style={{ fontWeight: 700, color: '#fff', margin: 0 }}>Temario curricular</h5>
-              <span style={{ fontSize: '.75rem', color: 'var(--lum-muted)' }}>4 MATERIAS</span>
+              <span style={{ fontSize: '.75rem', color: 'var(--lum-muted)' }}>{materias.length} MATERIAS</span>
             </div>
             <div className="d-flex flex-column gap-3">
-              {MATERIAS.map((m, i) => (
-                <ProgressCourse key={i} name={m.name} tema={m.tema} pct={m.pct} color={m.color} />
-              ))}
+              {materias.length === 0 ? (
+                <p style={{ color: 'var(--lum-muted)' }}>No hay materias asignadas.</p>
+              ) : (
+                materias.map((m, i) => (
+                  <ProgressCourse key={m.id} name={m.name} tema={m.description || 'Tema actual'} pct={m.pct} color={m.color} />
+                ))
+              )}
             </div>
-            <div className="mt-3">
-              <Link to="/salon/vivo" className="btn-lum btn-lum-primary" style={{ padding: '10px 22px' }}>
-                <i className="bi bi-play-fill" /> Continuar Física
-              </Link>
-            </div>
+            {materias.length > 0 && (
+              <div className="mt-3">
+                <Link to="/salon/vivo" className="btn-lum btn-lum-primary" style={{ padding: '10px 22px' }}>
+                  <i className="bi bi-play-fill" /> Continuar {materias[0].name}
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Tareas */}
@@ -124,38 +145,57 @@ export default function Salon() {
             </div>
 
             <div className="d-flex flex-column gap-3">
-              {tareas.map(t => (
-                <TaskItem key={t.id} task={t} onOpen={abrirTarea} />
-              ))}
+              {tareas.length === 0 ? (
+                <p style={{ color: 'var(--lum-muted)' }}>No tienes tareas pendientes. ¡Buen trabajo!</p>
+              ) : (
+                tareas.map(t => (
+                  <TaskItem key={t.id} task={t} onOpen={abrirTarea} />
+                ))
+              )}
             </div>
           </div>
         </div>
 
         {/* Right column */}
         <div className="col-lg-4">
-          <div className="lum-card p-4 mb-4 fade-up fade-up-d1" style={{ border: '1px solid rgba(108,99,255,.3)' }}>
-            <div className="badge-pill badge-primary mb-3">HOY · 16:30</div>
-            <h5 style={{ fontWeight: 700, color: '#fff', marginBottom: 4 }}>Laboratorio de ondas</h5>
-            <p style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginBottom: 16 }}>
-              Con Nexa y 8 estudiantes · 45 min
-            </p>
-            <Link to="/salon/vivo" className="btn-lum btn-lum-primary w-100 justify-content-center" style={{ padding: '10px' }}>
-              Ver preparación
-            </Link>
-          </div>
+          {claseEnVivo ? (
+            <div className="lum-card p-4 mb-4 fade-up fade-up-d1" style={{ border: '1px solid rgba(108,99,255,.3)' }}>
+              <div className="badge-pill badge-primary mb-3">
+                {new Date(claseEnVivo.scheduled_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </div>
+              <h5 style={{ fontWeight: 700, color: '#fff', marginBottom: 4 }}>{claseEnVivo.title}</h5>
+              <p style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginBottom: 16 }}>
+                Con Nexa · {claseEnVivo.subject?.name || 'Materia General'}
+              </p>
+              <Link to="/salon/vivo" className="btn-lum btn-lum-primary w-100 justify-content-center" style={{ padding: '10px' }}>
+                Ir a la clase
+              </Link>
+            </div>
+          ) : (
+            <div className="lum-card p-4 mb-4 fade-up fade-up-d1">
+              <h5 style={{ fontWeight: 700, color: '#fff', marginBottom: 4 }}>Próxima Clase</h5>
+              <p style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginBottom: 0 }}>
+                No tienes clases programadas hoy.
+              </p>
+            </div>
+          )}
 
           <div className="lum-card p-4 fade-up fade-up-d2">
             <h6 style={{ fontWeight: 700, color: '#fff', marginBottom: 12 }}>Resumen de tareas</h6>
-            {tareas.map((t, i) => (
-              <div key={i} className="d-flex align-items-center gap-2 mb-2">
-                <i className={`bi ${t.done ? 'bi-check-circle-fill' : 'bi-circle'}`}
-                  style={{ color: t.done ? 'var(--lum-success)' : 'var(--lum-muted)', flexShrink: 0 }} />
-                <span style={{ fontSize: '.82rem', color: t.done ? 'var(--lum-muted)' : 'var(--lum-text)',
-                  textDecoration: t.done ? 'line-through' : 'none' }}>
-                  {t.materia} · {t.titulo}
-                </span>
-              </div>
-            ))}
+            {tareas.length === 0 ? (
+              <p style={{ color: 'var(--lum-muted)', fontSize: '.85rem' }}>Nada pendiente.</p>
+            ) : (
+              tareas.map((t, i) => (
+                <div key={i} className="d-flex align-items-center gap-2 mb-2">
+                  <i className={`bi ${t.done ? 'bi-check-circle-fill' : 'bi-circle'}`}
+                    style={{ color: t.done ? 'var(--lum-success)' : 'var(--lum-muted)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '.82rem', color: t.done ? 'var(--lum-muted)' : 'var(--lum-text)',
+                    textDecoration: t.done ? 'line-through' : 'none' }}>
+                    {t.materia} · {t.titulo}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

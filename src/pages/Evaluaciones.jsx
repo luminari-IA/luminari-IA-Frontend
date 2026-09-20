@@ -1,12 +1,26 @@
+import { useState, useEffect } from 'react'
 import DashboardLayout from '../layouts/DashboardLayout'
-
-const EVALUACIONES = [
-  { materia: 'Matemáticas', tema: 'Funciones cuadráticas', estado: 'pendiente',  fecha: 'Hoy',        puntos: '-', color: '#00d4ff' },
-  { materia: 'Física',      tema: 'Cinemática básica',     estado: 'completada', fecha: 'Ayer',       puntos: '92', color: '#6c63ff' },
-  { materia: 'Química',     tema: 'Enlaces covalentes',    estado: 'completada', fecha: '15 de sep',  puntos: '78', color: '#f59e0b' },
-]
+import api from '../api/axios'
 
 export default function Evaluaciones() {
+  const [evaluaciones, setEvaluaciones] = useState([])
+
+  useEffect(() => {
+    api.get('/evaluations').then(res => {
+      const colors = ['#00d4ff', '#6c63ff', '#f59e0b', '#22c55e'];
+      const data = res.data.data.map((ev, i) => ({
+        id: ev.id,
+        materia: ev.subject?.name || 'General',
+        tema: 'Evaluación ' + ev.id, // En un modelo real vendría el tema
+        estado: ev.score !== null ? 'completada' : 'pendiente',
+        fecha: new Date(ev.created_at).toLocaleDateString(),
+        puntos: ev.score !== null ? (ev.score * 10).toString() : '-',
+        color: colors[i % colors.length]
+      }))
+      setEvaluaciones(data)
+    }).catch(err => console.error(err))
+  }, [])
+
   return (
     <DashboardLayout
       breadcrumb="LUMIRAI / EVALUACIONES"
@@ -19,44 +33,48 @@ export default function Evaluaciones() {
             <h5 style={{ fontWeight: 800, color: '#fff', marginBottom: 20 }}>Historial y pendientes</h5>
             
             <div className="d-flex flex-column gap-3">
-              {EVALUACIONES.map((ev, i) => (
-                <div key={i} className="p-3" style={{ 
-                  borderRadius: 12, border: '1px solid var(--lum-border)', 
-                  background: ev.estado === 'pendiente' ? 'rgba(108,99,255,.05)' : 'rgba(255,255,255,.02)' 
-                }}>
-                  <div className="d-flex align-items-center justify-content-between">
-                    <div className="d-flex align-items-center gap-3">
-                      <div style={{
-                        width: 40, height: 40, borderRadius: 10,
-                        background: `${ev.color}15`, border: `1px solid ${ev.color}40`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: ev.color, fontSize: '1.2rem'
-                      }}>
-                        {ev.estado === 'pendiente' ? <i className="bi bi-pencil-square" /> : <i className="bi bi-check-lg" />}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#fff', fontSize: '.95rem' }}>{ev.tema}</div>
-                        <div style={{ fontSize: '.8rem', color: 'var(--lum-muted)' }}>
-                          {ev.materia} · {ev.fecha}
+              {evaluaciones.length === 0 ? (
+                <p style={{ color: 'var(--lum-muted)' }}>No tienes evaluaciones registradas.</p>
+              ) : (
+                evaluaciones.map((ev, i) => (
+                  <div key={i} className="p-3" style={{ 
+                    borderRadius: 12, border: '1px solid var(--lum-border)', 
+                    background: ev.estado === 'pendiente' ? 'rgba(108,99,255,.05)' : 'rgba(255,255,255,.02)' 
+                  }}>
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div className="d-flex align-items-center gap-3">
+                        <div style={{
+                          width: 40, height: 40, borderRadius: 10,
+                          background: `${ev.color}15`, border: `1px solid ${ev.color}40`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: ev.color, fontSize: '1.2rem'
+                        }}>
+                          {ev.estado === 'pendiente' ? <i className="bi bi-pencil-square" /> : <i className="bi bi-check-lg" />}
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-end">
-                      {ev.estado === 'pendiente' ? (
-                        <button className="btn-lum btn-lum-primary" style={{ padding: '8px 20px', fontSize: '.85rem' }}>
-                          Comenzar
-                        </button>
-                      ) : (
                         <div>
-                          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff' }}>{ev.puntos}</div>
-                          <div style={{ fontSize: '.7rem', color: 'var(--lum-muted)' }}>PUNTOS</div>
+                          <div style={{ fontWeight: 700, color: '#fff', fontSize: '.95rem' }}>{ev.tema}</div>
+                          <div style={{ fontSize: '.8rem', color: 'var(--lum-muted)' }}>
+                            {ev.materia} · {ev.fecha}
+                          </div>
                         </div>
-                      )}
+                      </div>
+                      
+                      <div className="text-end">
+                        {ev.estado === 'pendiente' ? (
+                          <button className="btn-lum btn-lum-primary" style={{ padding: '8px 20px', fontSize: '.85rem' }}>
+                            Comenzar
+                          </button>
+                        ) : (
+                          <div>
+                            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff' }}>{ev.puntos}</div>
+                            <div style={{ fontSize: '.7rem', color: 'var(--lum-muted)' }}>PUNTOS</div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

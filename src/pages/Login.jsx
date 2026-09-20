@@ -1,7 +1,30 @@
-import { Link } from 'react-router-dom'
-import AuthLayout from '../layouts/AuthLayout'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from '../layouts/AuthLayout';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const result = await login(email, password);
+    if (result.success) {
+      navigate('/salon');
+    } else {
+      setError(result.error);
+      setLoading(false);
+    }
+  };
+
   const leftPanel = (
     <>
       <div className="badge-pill badge-accent mb-4">CONTINUIDAD SIN FRICCIÓN</div>
@@ -34,27 +57,54 @@ export default function Login() {
         <hr style={{ flex: 1, borderColor: 'var(--lum-border)' }} />
       </div>
 
-      <div className="d-flex flex-column gap-3 mb-2">
-        <div>
-          <label className="d-block mb-1" style={{ fontSize: '.8rem', color: 'var(--lum-muted)', fontWeight: 600 }}>
-            Correo electrónico
-          </label>
-          <input type="email" className="lum-input" placeholder="sofia@correo.com" />
+      {error && (
+        <div className="alert alert-danger" style={{ fontSize: '0.85rem', padding: '10px' }}>
+          {error}
         </div>
-        <div>
-          <div className="d-flex justify-content-between mb-1">
-            <label style={{ fontSize: '.8rem', color: 'var(--lum-muted)', fontWeight: 600 }}>Contraseña</label>
-            <Link to="/" style={{ fontSize: '.78rem', color: 'var(--lum-primary2)', textDecoration: 'none' }}>
-              ¿Olvidaste tu contraseña?
-            </Link>
-          </div>
-          <input type="password" className="lum-input" placeholder="••••••••••••" />
-        </div>
-      </div>
+      )}
 
-      <Link to="/salon" className="btn-lum btn-lum-primary w-100 justify-content-center mt-4" style={{ padding: '13px' }}>
-        Entrar a Lumirai <i className="bi bi-arrow-right ms-1" />
-      </Link>
+      <form onSubmit={handleSubmit}>
+        <div className="d-flex flex-column gap-3 mb-2">
+          <div>
+            <label className="d-block mb-1" style={{ fontSize: '.8rem', color: 'var(--lum-muted)', fontWeight: 600 }}>
+              Correo electrónico
+            </label>
+            <input 
+              type="email" 
+              className="lum-input" 
+              placeholder="sofia@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <div className="d-flex justify-content-between mb-1">
+              <label style={{ fontSize: '.8rem', color: 'var(--lum-muted)', fontWeight: 600 }}>Contraseña</label>
+              <Link to="/" style={{ fontSize: '.78rem', color: 'var(--lum-primary2)', textDecoration: 'none' }}>
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+            <input 
+              type="password" 
+              className="lum-input" 
+              placeholder="••••••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          className="btn-lum btn-lum-primary w-100 justify-content-center mt-4" 
+          style={{ padding: '13px' }}
+          disabled={loading}
+        >
+          {loading ? 'Entrando...' : 'Entrar a Lumirai'} <i className="bi bi-arrow-right ms-1" />
+        </button>
+      </form>
 
       <p className="text-center mt-4" style={{ fontSize: '.85rem', color: 'var(--lum-muted)' }}>
         ¿Primera vez aquí?{' '}
