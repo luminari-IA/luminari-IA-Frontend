@@ -105,7 +105,6 @@ export default function ClasesEnVivo() {
         if (videoRef.current) videoRef.current.srcObject = stream;
         setIsCamOn(true);
         if (isScreenShared) setIsScreenShared(false);
-        enviarEventoHardware("(He encendido mi cámara. Dime brevemente que me puedes ver.)");
       } catch (err) {
         console.error(err);
         alert('Error al acceder a la cámara.');
@@ -126,7 +125,6 @@ export default function ClasesEnVivo() {
         if (videoRef.current) videoRef.current.srcObject = stream;
         setIsScreenShared(true);
         if (isCamOn) setIsCamOn(false);
-        enviarEventoHardware("(He empezado a compartir mi pantalla. Dime brevemente que la estás viendo.)");
         
         stream.getVideoTracks()[0].onended = () => {
           setIsScreenShared(false);
@@ -135,21 +133,6 @@ export default function ClasesEnVivo() {
       } catch (err) {
         console.error(err);
       }
-    }
-  };
-
-  const enviarEventoHardware = async (evento) => {
-    if (!sessionId || loading) return;
-    setLoading(true);
-    try {
-      const res = await api.post(`/tutor/session/${sessionId}/message`, { message: evento });
-      const replyClean = res.data.reply.replace(/[*#|]/g, '');
-      setChatHistory(prev => [...prev, { role: 'assistant', content: replyClean }]);
-      speakText(replyClean);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -203,6 +186,18 @@ export default function ClasesEnVivo() {
     }
   };
 
+  const captureFrame = () => {
+    if ((!isCamOn && !isScreenShared) || !videoRef.current || !videoRef.current.videoWidth) return null;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    
+    return canvas.toDataURL('image/jpeg', 0.6);
+  };
+
   const enviarDuda = async () => {
     if (!duda.trim() || !sessionId || loading) return;
 
@@ -217,9 +212,12 @@ export default function ClasesEnVivo() {
     }
     if (window.speechSynthesis) window.speechSynthesis.cancel();
 
+    const base64Image = captureFrame();
+
     try {
       const res = await api.post(`/tutor/session/${sessionId}/message`, {
-        message: mensajeUsuario
+        message: mensajeUsuario,
+        image: base64Image
       });
       const replyClean = res.data.reply.replace(/\*/g, ''); // Fix the asterisks issue here so it's saved clean
       setChatHistory(prev => [...prev, { role: 'assistant', content: replyClean }]);
