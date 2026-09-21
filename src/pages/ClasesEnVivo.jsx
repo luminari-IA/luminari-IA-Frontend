@@ -24,6 +24,7 @@ export default function ClasesEnVivo() {
   
   const videoRef = useRef(null);
   const chatEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   // Setup Web Speech API for voice commands
   useEffect(() => {
@@ -197,6 +198,21 @@ export default function ClasesEnVivo() {
       setLoading(false);
     }
   };
+
+  // Auto-send voice command
+  useEffect(() => {
+    if (!isMicOn || !duda.trim() || loading || !sessionId) return;
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      enviarDuda();
+    }, 6000); // 6 segundos de silencio para auto-enviar
+
+    return () => clearTimeout(typingTimeoutRef.current);
+  }, [duda, isMicOn, loading, sessionId]);
 
   if (loadingInit) {
     return (
