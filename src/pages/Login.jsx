@@ -102,7 +102,7 @@ export default function Login() {
           style={{ padding: '13px' }}
           disabled={loading}
         >
-          {loading ? 'Entrando...' : 'Entrar a Lumirai'} <i className="bi bi-arrow-right ms-1" />
+          {loading ? 'Entrando...' : 'Entrar a Luminary'} <i className="bi bi-arrow-right ms-1" />
         </button>
       </form>
 

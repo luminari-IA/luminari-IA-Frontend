@@ -47,14 +47,14 @@ export default function TermsModal() {
           {/* Logo */}
           <div className="d-flex align-items-center gap-2 mb-4">
             <div className="logo-icon">L</div>
-            <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>Lumirai IA</span>
+            <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>Luminary IA</span>
           </div>
 
           <h2 style={{ fontWeight: 800, fontSize: '1.35rem', color: '#fff', marginBottom: 8 }}>
             Antes de continuar
           </h2>
           <p style={{ color: 'var(--lum-muted)', fontSize: '.88rem', lineHeight: 1.6, marginBottom: 20 }}>
-            Para usar Lumirai IA debes aceptar nuestros términos y condiciones y política de privacidad.
+            Para usar Luminary IA debes aceptar nuestros términos y condiciones y política de privacidad.
           </p>
 
           {/* Resumen términos */}

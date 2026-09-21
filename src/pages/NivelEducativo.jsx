@@ -4,7 +4,7 @@ import DashboardLayout from '../layouts/DashboardLayout'
 export default function NivelEducativo() {
   return (
     <DashboardLayout
-      breadcrumb="LUMIRAI / NIVEL EDUCATIVO"
+      breadcrumb="LUMINARY / NIVEL EDUCATIVO"
       title="Ruta de Aprendizaje"
       subtitle="Secundaria Avanzada · 4.º Año"
     >

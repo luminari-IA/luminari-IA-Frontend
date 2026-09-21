@@ -23,7 +23,7 @@ export default function Evaluaciones() {
 
   return (
     <DashboardLayout
-      breadcrumb="LUMIRAI / EVALUACIONES"
+      breadcrumb="LUMINARY / EVALUACIONES"
       title="Tus Evaluaciones"
       subtitle="Aquí encontrarás pruebas adaptativas generadas por Nexa."
     >
@@ -85,7 +85,7 @@ export default function Evaluaciones() {
               <i className="bi bi-shield-check" style={{ fontSize: '3rem', color: 'var(--lum-primary2)' }} />
               <h5 style={{ fontWeight: 800, color: '#fff', marginTop: 12 }}>Evaluaciones sin estrés</h5>
               <p style={{ color: 'var(--lum-muted)', fontSize: '.85rem', lineHeight: 1.6 }}>
-                En Lumirai, una mala nota no es un fracaso, es información. Nexa usa tus respuestas para entender qué temas necesitas reforzar y adapta tu ruta de aprendizaje automáticamente.
+                En Luminary, una mala nota no es un fracaso, es información. Nexa usa tus respuestas para entender qué temas necesitas reforzar y adapta tu ruta de aprendizaje automáticamente.
               </p>
             </div>
           </div>

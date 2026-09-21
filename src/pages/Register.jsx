@@ -124,7 +124,7 @@ export default function Register() {
           <input type="checkbox" id="terms" style={{ accentColor: 'var(--lum-primary)' }} required />
           <label htmlFor="terms" style={{ fontSize: '.82rem', color: 'var(--lum-muted)' }}>
             Acepto los <span style={{ color: 'var(--lum-primary2)' }}>Términos</span> y la{' '}
-            <span style={{ color: 'var(--lum-primary2)' }}>Política de privacidad</span> de Lumirai IA.
+            <span style={{ color: 'var(--lum-primary2)' }}>Política de privacidad</span> de Luminary IA.
           </label>
         </div>
 

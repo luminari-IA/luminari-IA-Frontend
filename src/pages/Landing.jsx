@@ -11,7 +11,7 @@ export default function Landing() {
       <nav className="glass d-flex align-items-center justify-content-between px-4 py-3 position-relative" style={{ zIndex: 10 }}>
         <div className="d-flex align-items-center gap-2">
           <div className="logo-icon">L</div>
-          <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>Lumirai IA</span>
+          <span style={{ fontWeight: 800, fontSize: '1.05rem' }}>Luminary IA</span>
         </div>
         <div className="d-flex gap-3">
           <Link to="/login" className="btn-lum btn-lum-ghost" style={{ padding: '8px 20px' }}>
@@ -38,7 +38,7 @@ export default function Landing() {
               Tu curiosidad merece una tutora que evolucione <span style={{ background: 'linear-gradient(90deg,#6c63ff,#00d4ff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>contigo.</span>
             </h1>
             <p style={{ color: 'var(--lum-muted)', fontSize: '1.05rem', lineHeight: 1.7, marginBottom: 32 }}>
-              Lumirai organiza tu currículo, entiende tu nivel y convierte cada duda en una ruta clara de aprendizaje.
+              Luminary organiza tu currículo, entiende tu nivel y convierte cada duda en una ruta clara de aprendizaje.
             </p>
             <div className="d-flex flex-wrap gap-3 mb-4">
               <Link to="/registro" className="btn-lum btn-lum-primary" style={{ padding: '13px 30px', fontSize: '1rem' }}>

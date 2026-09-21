@@ -282,7 +282,7 @@ export default function ClasesEnVivo() {
 
   if (loadingInit) {
     return (
-      <DashboardLayout breadcrumb="LUMIRAI / CLASES EN VIVO" title="Preparando entorno..." subtitle="">
+      <DashboardLayout breadcrumb="LUMINARY / CLASES EN VIVO" title="Preparando entorno..." subtitle="">
         <div className="text-center p-5"><div className="spinner-border text-primary" /></div>
       </DashboardLayout>
     );
@@ -292,7 +292,7 @@ export default function ClasesEnVivo() {
   if (!selectedSubject) {
     return (
       <DashboardLayout 
-        breadcrumb="LUMIRAI / CLASES EN VIVO" 
+        breadcrumb="LUMINARY / CLASES EN VIVO" 
         title="Clases Inteligentes Bajo Demanda" 
         subtitle="Selecciona la materia que deseas estudiar y Nexa generará una sesión interactiva al instante."
       >
@@ -330,7 +330,7 @@ export default function ClasesEnVivo() {
   // Vista 2: Sesión de clase activa
   return (
     <DashboardLayout
-      breadcrumb={`LUMIRAI / EN VIVO / ${selectedSubject.name.toUpperCase()}`}
+      breadcrumb={`LUMINARY / EN VIVO / ${selectedSubject.name.toUpperCase()}`}
       title={`Nexa · ${selectedSubject.name}`}
       subtitle="Sesión interactiva generada por IA"
       rightElement={

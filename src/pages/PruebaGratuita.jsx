@@ -4,7 +4,7 @@ import Logo from '../components/ui/Logo'
 
 // Simula la tutora Nexa en modo demo
 const DEMO_CHAT = [
-  { who: 'nexa', msg: '¡Hola! Soy Nexa, tu tutora IA. Esta es una vista previa gratuita de Lumirai. ¿Sobre qué tema te puedo ayudar hoy?' },
+  { who: 'nexa', msg: '¡Hola! Soy Nexa, tu tutora IA. Esta es una vista previa gratuita de Luminary. ¿Sobre qué tema te puedo ayudar hoy?' },
 ]
 
 const DEMO_MATERIAS = [
@@ -92,7 +92,7 @@ export default function PruebaGratuita() {
           <div className="flex-grow-1">
             <span style={{ fontWeight: 700, color: 'var(--lum-warning)', fontSize: '.88rem' }}>Modo demostración</span>
             <span style={{ color: 'var(--lum-muted)', fontSize: '.82rem', marginLeft: 8 }}>
-              Estás explorando Lumirai sin cuenta. Los datos son de ejemplo y no se guardan.
+              Estás explorando Luminary sin cuenta. Los datos son de ejemplo y no se guardan.
             </span>
           </div>
           <Link to="/registro" style={{ color: 'var(--lum-primary2)', fontSize: '.82rem', fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}>

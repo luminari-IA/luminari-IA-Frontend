@@ -20,7 +20,7 @@ export default function Sidebar({ isOpen, onClose }) {
       <div className="d-flex align-items-center justify-content-between mb-4">
         <div className="sidebar-logo mb-0">
           <div className="logo-icon">L</div>
-          <span>Lumirai IA</span>
+          <span>Luminary IA</span>
         </div>
         <button 
           className="d-lg-none btn-lum btn-lum-ghost" 

@@ -77,7 +77,7 @@ export default function OnboardingNivel() {
           <div>
             <div style={{ fontWeight: 700, color: 'var(--lum-warning)', fontSize: '.85rem' }}>Dato curioso</div>
             <p style={{ color: 'var(--lum-muted)', fontSize: '.8rem', margin: 0, marginTop: 4 }}>
-              El 60% de los estudiantes subestima su nivel en ciencias. No te preocupes por equivocarte, Lumirai se ajustará en tiempo real.
+              El 60% de los estudiantes subestima su nivel en ciencias. No te preocupes por equivocarte, Luminary se ajustará en tiempo real.
             </p>
           </div>
         </div>

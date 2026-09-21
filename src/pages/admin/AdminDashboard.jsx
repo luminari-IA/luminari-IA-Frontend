@@ -52,7 +52,7 @@ export default function AdminDashboard() {
 
   return (
     <DashboardLayout
-      breadcrumb="LUMIRAI / ADMIN"
+      breadcrumb="LUMINARY / ADMIN"
       title="Panel de Control del Administrador"
       subtitle="Gestiona el contenido de Luminary y el cerebro de Nexa."
     >

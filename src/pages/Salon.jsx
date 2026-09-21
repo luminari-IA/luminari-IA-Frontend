@@ -80,7 +80,7 @@ export default function Salon() {
 
   return (
     <DashboardLayout
-      breadcrumb="Lumirai / Salón de clases"
+      breadcrumb="Luminary / Salón de clases"
       title={`Buenos días, ${userName} 👋`}
       subtitle={`Tienes ${pendientes} tarea${pendientes !== 1 ? 's' : ''} pendiente${pendientes !== 1 ? 's' : ''}.`}
       rightElement={
