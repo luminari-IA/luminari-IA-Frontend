@@ -71,13 +71,24 @@ export default function Sidebar({ isOpen, onClose }) {
 
       {/* User card */}
       <div className="sidebar-user">
-        <div className="d-flex align-items-center gap-2">
-          <div style={{
-            width: 34, height: 34, borderRadius: '50%',
-            background: 'linear-gradient(135deg,#6c63ff,#a855f7)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 700, fontSize: '.85rem', color: '#fff', flexShrink: 0
-          }}>{initial}</div>
+        <div className="d-flex align-items-center gap-2 mb-2">
+          {user?.profile_photo_path ? (
+            <img 
+              src={user.profile_photo_path} 
+              alt="Profile" 
+              style={{
+                width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
+                border: '1px solid var(--lum-border)'
+              }} 
+            />
+          ) : (
+            <div style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'linear-gradient(135deg,#6c63ff,#a855f7)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 700, fontSize: '.85rem', color: '#fff', flexShrink: 0
+            }}>{initial}</div>
+          )}
           <div>
             <div className="name" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '140px' }}>{userName}</div>
             <div className="level">
@@ -85,6 +96,22 @@ export default function Sidebar({ isOpen, onClose }) {
             </div>
           </div>
         </div>
+
+        {/* Botón Mi Perfil */}
+        <button
+          onClick={() => { onClose && onClose(); navigate('/salon/perfil'); }}
+          style={{
+            marginTop: 8, width: '100%', display: 'flex', alignItems: 'center',
+            gap: 8, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--lum-border)',
+            background: 'transparent', color: 'var(--lum-text)', cursor: 'pointer',
+            fontSize: '.82rem', fontWeight: 600, transition: 'all .18s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,.05)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <i className="bi bi-person-gear" />
+          Mi Perfil
+        </button>
 
         {/* Botón ver como estudiante (solo admin) */}
         {user?.role === 'admin' && (

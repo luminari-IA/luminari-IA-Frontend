@@ -71,10 +71,41 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('luminary_token');
         setToken(null);
         setUser(null);
+        // Reset CSS
+        document.documentElement.style.removeProperty('--lum-primary');
+        document.documentElement.style.removeProperty('--lum-font');
+        document.body.classList.remove('reduced-animations');
+    };
+
+    const applyUserTheme = (userData) => {
+        if (!userData) return;
+        
+        if (userData.theme_color) {
+            document.documentElement.style.setProperty('--lum-primary', userData.theme_color);
+            // Derive a slightly darker version for hover states if possible, or let CSS handle opacity
+        }
+        if (userData.font_family) {
+            document.documentElement.style.setProperty('--lum-font', userData.font_family);
+        }
+        
+        if (userData.reduced_animations) {
+            document.body.classList.add('reduced-animations');
+        } else {
+            document.body.classList.remove('reduced-animations');
+        }
+    };
+
+    // Aplicar el tema cada vez que el usuario cambia
+    useEffect(() => {
+        applyUserTheme(user);
+    }, [user]);
+
+    const updateUser = (data) => {
+        setUser(prev => ({ ...prev, ...data }));
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

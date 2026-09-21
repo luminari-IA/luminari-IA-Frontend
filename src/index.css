@@ -281,3 +281,15 @@ body {
     gap: 12px;
   }
 }
+
+/* Reduced Animations Support */
+body.reduced-animations * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+body.reduced-animations .orb {
+  display: none !important;
+}

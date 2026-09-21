@@ -150,6 +150,11 @@ export default function ClasesEnVivo() {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'es-ES';
     
+    // Set speed based on user preferences
+    if (user?.tts_speed === 'slow') utterance.rate = 0.8;
+    else if (user?.tts_speed === 'fast') utterance.rate = 1.25;
+    else utterance.rate = 1.0;
+
     const voices = window.speechSynthesis.getVoices();
     const esVoice = voices.find(v => v.lang.includes('es') && (v.name.includes('Google') || v.name.includes('Natural')));
     if (esVoice) utterance.voice = esVoice;
