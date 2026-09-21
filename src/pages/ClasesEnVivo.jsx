@@ -438,7 +438,8 @@ export default function ClasesEnVivo() {
                       color: '#fff', fontSize: '.85rem', border: msg.role === 'assistant' ? '1px solid var(--lum-border)' : 'none',
                       borderBottomRightRadius: msg.role === 'user' ? 4 : 14,
                       borderBottomLeftRadius: msg.role === 'assistant' ? 4 : 14,
-                      lineHeight: '1.4'
+                      lineHeight: '1.4',
+                      whiteSpace: 'pre-wrap'
                     }}>
                       {msg.content}
                     </div>
