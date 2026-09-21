@@ -135,16 +135,29 @@ export default function ClasesEnVivo() {
   };
 
   const speakText = (text) => {
-    if (!isVoiceOn || !window.speechSynthesis) return;
+    if (!isVoiceOn || !window.speechSynthesis) {
+      if (recognition) {
+        setIsMicOn(true);
+        try { recognition.start(); } catch(e) {}
+      }
+      return;
+    }
+    
     window.speechSynthesis.cancel();
-    const cleanText = text.replace(/\*/g, '');
+    const cleanText = text.replace(/[*#|]/g, '');
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'es-ES';
     
-    // Attempt to use a better default voice
     const voices = window.speechSynthesis.getVoices();
     const esVoice = voices.find(v => v.lang.includes('es') && (v.name.includes('Google') || v.name.includes('Natural')));
     if (esVoice) utterance.voice = esVoice;
+    
+    utterance.onend = () => {
+      if (recognition) {
+        setIsMicOn(true);
+        try { recognition.start(); } catch(e) {}
+      }
+    };
     
     window.speechSynthesis.speak(utterance);
   };
