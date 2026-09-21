@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../layouts/DashboardLayout'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
 export default function ClasesEnVivo() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   
   const [materias, setMaterias] = useState([])
   const [selectedSubject, setSelectedSubject] = useState(null)
@@ -103,6 +105,7 @@ export default function ClasesEnVivo() {
         if (videoRef.current) videoRef.current.srcObject = stream;
         setIsCamOn(true);
         if (isScreenShared) setIsScreenShared(false);
+        enviarEventoHardware("(He encendido mi cámara. Dime brevemente que me puedes ver.)");
       } catch (err) {
         console.error(err);
         alert('Error al acceder a la cámara.');
@@ -123,6 +126,7 @@ export default function ClasesEnVivo() {
         if (videoRef.current) videoRef.current.srcObject = stream;
         setIsScreenShared(true);
         if (isCamOn) setIsCamOn(false);
+        enviarEventoHardware("(He empezado a compartir mi pantalla. Dime brevemente que la estás viendo.)");
         
         stream.getVideoTracks()[0].onended = () => {
           setIsScreenShared(false);
@@ -131,6 +135,21 @@ export default function ClasesEnVivo() {
       } catch (err) {
         console.error(err);
       }
+    }
+  };
+
+  const enviarEventoHardware = async (evento) => {
+    if (!sessionId || loading) return;
+    setLoading(true);
+    try {
+      const res = await api.post(`/tutor/session/${sessionId}/message`, { message: evento });
+      const replyClean = res.data.reply.replace(/[*#|]/g, '');
+      setChatHistory(prev => [...prev, { role: 'assistant', content: replyClean }]);
+      speakText(replyClean);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -226,6 +245,42 @@ export default function ClasesEnVivo() {
 
     return () => clearTimeout(typingTimeoutRef.current);
   }, [duda, isMicOn, loading, sessionId]);
+
+  const finalizarClase = async () => {
+    if (!sessionId || loading) return;
+    
+    if (recognition) recognition.stop();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (videoRef.current && videoRef.current.srcObject) {
+      videoRef.current.srcObject.getTracks().forEach(t => t.stop());
+    }
+
+    setLoading(true);
+    setChatHistory(prev => [...prev, { role: 'system', content: 'Cerrando sesión y asignando tarea final...' }]);
+
+    try {
+      const res = await api.post(`/tutor/session/${sessionId}/finish`);
+      const taskTitle = res.data.task.title;
+      const finalMsg = "Excelente trabajo hoy. Te he asignado una nueva tarea: " + taskTitle + ". Serás redirigido al salón.";
+      
+      const utterance = new SpeechSynthesisUtterance(finalMsg);
+      utterance.lang = 'es-ES';
+      const voices = window.speechSynthesis.getVoices();
+      const esVoice = voices.find(v => v.lang.includes('es') && (v.name.includes('Google') || v.name.includes('Natural')));
+      if (esVoice) utterance.voice = esVoice;
+      
+      utterance.onend = () => {
+        navigate('/salon');
+      };
+      
+      window.speechSynthesis.speak(utterance);
+      
+    } catch (err) {
+      console.error(err);
+      alert('Error al finalizar la sesión.');
+      setLoading(false);
+    }
+  };
 
   if (loadingInit) {
     return (
@@ -344,7 +399,7 @@ export default function ClasesEnVivo() {
                   </button>
                 </div>
                 
-                <button className="btn-lum btn-lum-ghost" style={{ background: 'rgba(239,68,68,.15)', color: '#ef4444' }} onClick={() => setSelectedSubject(null)}>
+                <button className="btn-lum btn-lum-ghost" style={{ background: 'rgba(239,68,68,.15)', color: '#ef4444' }} onClick={finalizarClase}>
                   <i className="bi bi-box-arrow-right me-2" /> Finalizar Sesión
                 </button>
               </div>
