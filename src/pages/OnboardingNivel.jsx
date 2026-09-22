@@ -1,18 +1,43 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AuthLayout from '../layouts/AuthLayout'
 
-const SELECCION = [
+const TODOS_LOS_INTERESES = [
   { id: 'mat', name: 'Matemáticas' },
   { id: 'bio', name: 'Biología' },
   { id: 'fis', name: 'Física' },
   { id: 'qui', name: 'Química' },
+  { id: 'pro', name: 'Programación' },
+  { id: 'his', name: 'Historia' },
+  { id: 'len', name: 'Lengua' },
+  { id: 'ing', name: 'Inglés' },
 ]
 
 const NIVELES = ['Cero', 'Básico', 'Intermedio', 'Avanzado']
 
 export default function OnboardingNivel() {
-  const [niveles, setNiveles] = useState({ mat: 1, bio: 0, fis: 1, qui: 0 })
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  // Por defecto, unas cuantas materias si se navega directo sin estado
+  const fallback = ['mat', 'bio', 'fis', 'qui']
+  const selectedSubjects = location.state?.selectedSubjects || fallback
+  
+  // Filtramos la información completa basada en la selección
+  const seleccion = TODOS_LOS_INTERESES.filter(m => selectedSubjects.includes(m.id))
+
+  // Inicializar estado de niveles solo con las materias seleccionadas
+  const initialNiveles = {}
+  seleccion.forEach(m => initialNiveles[m.id] = 0)
+  
+  const [niveles, setNiveles] = useState(initialNiveles)
+
+  // Redirect a intereses si no hay nada seleccionado (opcional, pero útil)
+  useEffect(() => {
+    if (!location.state?.selectedSubjects || location.state.selectedSubjects.length === 0) {
+      navigate('/onboarding/intereses')
+    }
+  }, [location, navigate])
 
   const updateNivel = (id, n) => { setNiveles(p => ({ ...p, [id]: n })) }
 
@@ -39,20 +64,20 @@ export default function OnboardingNivel() {
       </p>
 
       <div className="d-flex flex-column gap-3 mb-4">
-        {SELECCION.map(m => (
+        {seleccion.map(m => (
           <div key={m.id} className="lum-card p-3" style={{ background: 'rgba(255,255,255,.02)', border: '1px solid var(--lum-border)' }}>
             <div className="d-flex align-items-center justify-content-between mb-2">
               <span style={{ fontWeight: 700, color: '#fff', fontSize: '.95rem' }}>{m.name}</span>
               <span style={{ fontSize: '.75rem', fontWeight: 600, color: 'var(--lum-primary2)' }}>
-                {NIVELES[niveles[m.id]].toUpperCase()}
+                {NIVELES[niveles[m.id] || 0].toUpperCase()}
               </span>
             </div>
             
             {/* Slider de nivel */}
             <div className="d-flex gap-2">
               {NIVELES.map((n, i) => {
-                const on = i <= niveles[m.id]
-                const current = i === niveles[m.id]
+                const on = i <= (niveles[m.id] || 0)
+                const current = i === (niveles[m.id] || 0)
                 return (
                   <button
                     key={n} onClick={() => updateNivel(m.id, i)}
@@ -84,10 +109,10 @@ export default function OnboardingNivel() {
       </div>
 
       <div className="d-flex justify-content-between">
-        <Link to="/onboarding/intereses" className="btn-lum btn-lum-ghost" style={{ padding: '11px 24px' }}>
+        <Link to="/onboarding/intereses" state={{ selectedSubjects }} className="btn-lum btn-lum-ghost" style={{ padding: '11px 24px' }}>
           <i className="bi bi-arrow-left me-1" /> Atrás
         </Link>
-        <Link to="/onboarding/ia" className="btn-lum btn-lum-primary" style={{ padding: '11px 28px' }}>
+        <Link to="/onboarding/ia" state={{ selectedSubjects, niveles }} className="btn-lum btn-lum-primary" style={{ padding: '11px 28px' }}>
           Conocer a mi tutora <i className="bi bi-arrow-right ms-1" />
         </Link>
       </div>

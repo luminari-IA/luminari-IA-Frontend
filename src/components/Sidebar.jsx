@@ -72,9 +72,9 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* User card */}
       <div className="sidebar-user">
         <div className="d-flex align-items-center gap-2 mb-2">
-          {user?.profile_photo_path ? (
+          {user?.profile_photo_url ? (
             <img 
-              src={user.profile_photo_path} 
+              src={user.profile_photo_url} 
               alt="Profile" 
               style={{
                 width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,

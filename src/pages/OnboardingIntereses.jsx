@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import AuthLayout from '../layouts/AuthLayout'
 
 const MATERIAS = [
@@ -14,7 +14,8 @@ const MATERIAS = [
 ]
 
 export default function OnboardingIntereses() {
-  const [selected, setSelected] = useState(['mat', 'bio', 'fis', 'qui'])
+  const location = useLocation()
+  const [selected, setSelected] = useState(location.state?.selectedSubjects || ['mat', 'bio', 'fis', 'qui'])
 
   const toggle = (id) => {
     setSelected(prev =>
@@ -85,7 +86,7 @@ export default function OnboardingIntereses() {
         <Link to="/registro" className="btn-lum btn-lum-ghost" style={{ padding: '11px 24px' }}>
           <i className="bi bi-arrow-left me-1" /> Atrás
         </Link>
-        <Link to="/onboarding/nivel" className="btn-lum btn-lum-primary" style={{ padding: '11px 28px' }}>
+        <Link to="/onboarding/nivel" state={{ selectedSubjects: selected }} className="btn-lum btn-lum-primary" style={{ padding: '11px 28px' }}>
           Definir mis niveles <i className="bi bi-arrow-right ms-1" />
         </Link>
       </div>

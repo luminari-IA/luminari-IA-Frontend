@@ -18,7 +18,7 @@ export default function Profile() {
     reduced_animations: user?.reduced_animations || false,
     tts_speed: user?.tts_speed || 'normal'
   })
-  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo_path || null)
+  const [photoPreview, setPhotoPreview] = useState(user?.profile_photo_url || null)
   const [selectedFile, setSelectedFile] = useState(null)
 
   const handleChange = (e) => {
