@@ -22,7 +22,7 @@ export default function Salon() {
 
   useEffect(() => {
     // Cargar materias
-    api.get('/subjects').then(res => {
+    api.get('/user/subjects').then(res => {
       // Mapeamos colores y porcentajes aleatorios/falsos por ahora si no vienen del back
       const colors = ['#6c63ff', '#00d4ff', '#f59e0b', '#22c55e'];
       const data = res.data.data.map((m, i) => ({

@@ -10,6 +10,7 @@ import Salon from './pages/Salon'
 import ClasesEnVivo from './pages/ClasesEnVivo'
 import NivelEducativo from './pages/NivelEducativo'
 import Evaluaciones from './pages/Evaluaciones'
+import ExplorarClases from './pages/ExplorarClases'
 import PruebaGratuita from './pages/PruebaGratuita'
 import Profile from './pages/Profile'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/salon/vivo"            element={<ProtectedRoute><ClasesEnVivo /></ProtectedRoute>} />
         <Route path="/salon/nivel"           element={<ProtectedRoute><NivelEducativo /></ProtectedRoute>} />
         <Route path="/salon/evaluaciones"    element={<ProtectedRoute><Evaluaciones /></ProtectedRoute>} />
+        <Route path="/salon/explorar"        element={<ProtectedRoute><ExplorarClases /></ProtectedRoute>} />
         <Route path="/salon/perfil"          element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         
         {/* Rutas Administrador */}

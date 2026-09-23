@@ -57,6 +57,11 @@ export default function Sidebar({ isOpen, onClose }) {
                 <i className="bi bi-file-earmark-check" /> Evaluaciones
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/salon/explorar" onClick={onClose} className={({ isActive }) => `lum-nav-link ${isActive ? 'active' : ''}`}>
+                <i className="bi bi-compass" /> Explorar Clases
+              </NavLink>
+            </li>
           </>
         )}
 

@@ -1,7 +1,55 @@
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AuthLayout from '../layouts/AuthLayout'
+import api from '../api/axios'
+
+const ID_TO_NAME = {
+  mat: 'Matemáticas', bio: 'Biología', fis: 'Física', qui: 'Química',
+  pro: 'Programación', his: 'Historia', len: 'Lengua', ing: 'Inglés'
+}
 
 export default function OnboardingIA() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [saving, setSaving] = useState(false)
+  const [subjects, setSubjects] = useState([])
+
+  useEffect(() => {
+    // Cargar materias para saber sus IDs reales
+    api.get('/subjects').then(res => {
+      setSubjects(res.data.data)
+    }).catch(err => console.error(err))
+  }, [])
+
+  const handleFinish = async (e) => {
+    e.preventDefault()
+    if (saving) return
+    setSaving(true)
+
+    const selectedSubjects = location.state?.selectedSubjects || []
+    const niveles = location.state?.niveles || {}
+
+    // Mapear los IDs del frontend a los IDs del backend
+    const payload = selectedSubjects.map(shortId => {
+      const name = ID_TO_NAME[shortId]
+      const subject = subjects.find(s => s.name === name)
+      return {
+        id: subject?.id,
+        level: niveles[shortId] || 0
+      }
+    }).filter(s => s.id) // remover no encontrados
+
+    try {
+      if (payload.length > 0) {
+        await api.post('/user/subjects', { subjects: payload })
+      }
+      navigate('/salon')
+    } catch (err) {
+      console.error(err)
+      setSaving(false)
+    }
+  }
+
   return (
     <AuthLayout>
       <div className="d-flex align-items-center gap-2 mb-3">
@@ -51,12 +99,12 @@ export default function OnboardingIA() {
       </div>
 
       <div className="d-flex justify-content-between align-items-center">
-        <Link to="/onboarding/nivel" className="btn-lum btn-lum-ghost" style={{ padding: '11px 24px' }}>
+        <Link to="/onboarding/nivel" state={location.state} className="btn-lum btn-lum-ghost" style={{ padding: '11px 24px' }}>
           <i className="bi bi-arrow-left me-1" /> Atrás
         </Link>
-        <Link to="/salon" className="btn-lum btn-lum-primary" style={{ padding: '11px 28px' }}>
-          Empezar a aprender <i className="bi bi-rocket-takeoff-fill ms-2" />
-        </Link>
+        <button onClick={handleFinish} disabled={saving || subjects.length === 0} className="btn-lum btn-lum-primary" style={{ padding: '11px 28px', border: 'none' }}>
+          {saving ? 'Guardando...' : 'Empezar a aprender'} <i className="bi bi-rocket-takeoff-fill ms-2" />
+        </button>
       </div>
     </AuthLayout>
   )
